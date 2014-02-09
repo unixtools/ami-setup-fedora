@@ -87,6 +87,13 @@ install strace
 install ltrace
 install mbuffer
 install yajl
+install glibc-devel
+install gcc-c++
+install mod_php
+install pcre-devel
+install sqlite-devel
+install openssl-devel
+install tidy-devel
 upgrade
 run
 EOF
