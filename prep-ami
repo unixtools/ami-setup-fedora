@@ -1,0 +1,45 @@
+#!/bin/sh -x
+
+yum clean all
+
+rm -rf /tmp/*.txt
+rm -rf /tmp/*.log
+rm -rf /tmp/*.xml
+rm -rf /tmp/.??*
+rm -rf /tmp/*
+
+rm -rf /var/tmp/*.txt
+rm -rf /var/tmp/*.log
+rm -rf /var/tmp/*.xml
+rm -rf /var/tmp/.??*
+rm -rf /var/tmp/*
+
+rm -f /var/spool/mail/*
+
+# Start with blank slate
+rm -rf /root/.ssh
+umask 077
+mkdir -p /root/.ssh
+
+find /var/log -name "*-2*" -exec rm -f {} \;
+find /var/log -name "*.old" -exec rm -f {} \;
+
+# Empty out the log files
+find /var/log -type f -exec cp /dev/null {} \;
+cp /dev/null /home/local/messages.debug
+
+cat /dev/null > /var/log/messages
+cat /dev/null > /var/log/dmesg
+cat /dev/null > /var/log/dracut.log
+cat /dev/null > /var/log/btmp
+cat /dev/null > /var/log/wtmp
+
+rm -rf /var/lib/cloud/data
+rm -rf /var/lib/cloud/instance
+rm -rf /var/lib/cloud/instances/*
+
+rm -f /var/log/sa/*
+
+echo "baseami" > /etc/hostname
+
+sync

@@ -1,0 +1,77 @@
+#!/bin/sh
+
+if [ ! -e /home/ami-setup/.git ]; then
+echo "Must clone ami-setup to /home/ami-setup"
+exit 1
+fi
+
+setenforce 0
+
+chown -R root:root /home/ami-setup/overlay
+cd /home/ami-setup/overlay || exit 1
+find . -print | cpio -pdmuv /
+
+ed /root/.bashrc <<EOF
+g/alias/d
+.
+w
+q
+EOF
+
+# Set up ssh access
+ed /etc/ssh/sshd_config <<EOF
+g/PasswordAuthentication/d
+g/PermitRootLogin/d
+a
+PermitRootLogin yes
+PasswordAuthentication yes
+.
+w
+q
+EOF
+
+ed /etc/sysconfig/selinux <<EOF
+g/SELINUX=/d
+$
+a
+SELINUX=disabled
+.
+w
+q
+EOF
+
+# Create dir for rsyslog
+mkdir -p /home/local
+
+# Install Nathan's rclocal scripts
+yum -y localinstall /home/ami-setup/rpms/*.rpm
+
+# Clean up any cloud-init stuff
+rm -rf /var/lib/cloud/data
+rm -rf /var/lib/cloud/instance
+rm -rf /var/lib/cloud/instances/*
+
+# Remove 'fedora' userid if it was set up
+
+userdel -f fedora
+rm -rf /home/fedora
+
+# enable ntp
+systemctl enable ntpdate.service
+systemctl enable ntpd.service
+
+cat >/etc/ntp/step-tickers <<EOF
+0.fedora.pool.ntp.org
+1.fedora.pool.ntp.org
+2.fedora.pool.ntp.org
+3.fedora.pool.ntp.org
+EOF
+
+rm -f /etc/sudoers.d/90-cloud-init-users
+
+echo "######################"
+echo "Manual Action Required"
+echo "######################"
+echo "Populate ~root/.awssecret with AWS deployment keys mode 0600."
+echo "Once that is done, run: sevogle-deploy aws"
+echo ""
