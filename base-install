@@ -99,6 +99,7 @@ install perl-CGI
 install mysql
 install python-pip
 install python-virtualenv
+install yum-utils
 upgrade
 run
 EOF
