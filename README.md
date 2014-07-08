@@ -13,7 +13,7 @@ As of 2014-07-07 this is:
 
 	F20 64bit - us-east - ami-21362b48
 
-Launch as an m3.medium
+Launch as an m3.medium with at least ssh access open.
 
 Run these commands:
 
